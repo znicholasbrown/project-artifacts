@@ -18,7 +18,7 @@ class GetReadMe(Task):
 
 class GenerateArtifact(Task):
     def run(self, readme):
-        artifact_id = artifacts.create_markdown(readme)
+        artifact_id = artifacts.create_markdown("""{readme}""")
         return artifact_id
 
 
