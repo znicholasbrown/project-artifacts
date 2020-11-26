@@ -31,6 +31,7 @@ with Flow("GitHub README Artifacts") as flow:
 flow.storage = GitHub(
     repo="znicholasbrown/project-artifacts",
     path="github-readme-artifacts.py",
+    ref="master",
     secrets=["GITHUB_AUTH_TOKEN"],
 )
 
