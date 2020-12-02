@@ -3,6 +3,8 @@ from prefect import Flow, Task, artifacts, Parameter
 from prefect.client import Secret
 from prefect.environments.storage import GitHub
 from github import Github as GithubClient
+import base64
+import pprint
 
 
 class GetReadMe(Task):
@@ -13,12 +15,14 @@ class GetReadMe(Task):
         repo = github_client.get_repo(ref)
         readme = repo.get_contents("README.md")
 
-        return readme.decoded_content
+        b = base64.b64decode(readme.content)
+
+        return b.decode("utf-8")
 
 
 class GenerateArtifact(Task):
     def run(self, readme):
-        artifact_id = artifacts.create_markdown(f"""{readme}""")
+        artifact_id = artifacts.create_markdown(readme)
         return artifact_id
 
 
