@@ -27,10 +27,10 @@ class GenerateArtifact(Task):
 
 
 with Flow("GitHub README Artifacts") as flow:
-    repo = Parameter("repo", "PrefectHQ/prefect")
+    repos = Parameter("repo", ["PrefectHQ/prefect", "PrefectHQ/ui", "PrefectHQ/server"])
 
-    readme = GetReadMe()(ref=repo)
-    GenerateArtifact()(readme=readme)
+    readme = GetReadMe().map(ref=repos)
+    GenerateArtifact().map(readme=readme)
 
 
 flow.storage = GitHub(
@@ -39,5 +39,6 @@ flow.storage = GitHub(
     ref="master",
     secrets=["GITHUB_AUTH_TOKEN"],
 )
+
 
 flow.register(project_name="Artifacts")
