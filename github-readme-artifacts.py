@@ -1,10 +1,11 @@
-import prefect
-from prefect import Flow, Task, artifacts, Parameter
-from prefect.client import Secret
-from prefect.environments.storage import GitHub
-from github import Github as GithubClient
 import base64
 import pprint
+
+import prefect
+from github import Github as GithubClient
+from prefect import Flow, Parameter, Task, artifacts
+from prefect.client import Secret
+from prefect.environments.storage import GitHub
 
 
 class GetReadMe(Task):
@@ -21,7 +22,7 @@ class GetReadMe(Task):
 
 
 class GenerateArtifact(Task):
-    def run(self, readme):
+    def run(self, readme, ref):
         artifact_id = artifacts.create_markdown(readme)
         return artifact_id
 
@@ -29,8 +30,13 @@ class GenerateArtifact(Task):
 with Flow("GitHub README Artifacts") as flow:
     repos = Parameter("repo", ["PrefectHQ/prefect", "PrefectHQ/ui", "PrefectHQ/server"])
 
-    readme = GetReadMe().map(ref=repos)
-    GenerateArtifact().map(readme=readme)
+    readme = GetReadMe(task_run_name=lambda **kwargs: f"Fetch {kwargs['ref']}").map(
+        ref=repos
+    )
+
+    GenerateArtifact(task_run_name=lambda **kwargs: f"Render {kwargs['ref']}").map(
+        readme=readme, ref=repos
+    )
 
 
 flow.storage = GitHub(
