@@ -1,11 +1,5 @@
-import base64
-import pprint
-
-import prefect
-from github import Github as GithubClient
-from prefect import Flow, Parameter, Task, artifacts
+from prefect import Flow, Task, artifacts
 from prefect.tasks.prefect import StartFlowRun
-from prefect.client import Secret
 from prefect.environments.storage import GitHub
 
 
